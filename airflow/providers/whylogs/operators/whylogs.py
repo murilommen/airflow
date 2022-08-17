@@ -19,8 +19,8 @@
 from typing import Any, Optional
 
 import whylogs as why
+from whylogs.core.constraints import Constraints, ConstraintsBuilder, MetricConstraint
 from whylogs.viz.extensions.reports.summary_drift import SummaryDriftReport
-from whylogs.core.constraints import ConstraintsBuilder, MetricConstraint, Constraints
 
 from airflow.exceptions import AirflowFailException
 from airflow.models import BaseOperator
@@ -28,8 +28,8 @@ from airflow.models import BaseOperator
 
 class WhylogsSummaryDriftOperator(BaseOperator):
     """
-    This operator creates a whylogs' Summary Drift report from two existing whylogs profiles. 
-    One of them is the reference profile, the "ground truth", and the other one is the target data, 
+    This operator creates a whylogs' Summary Drift report from two existing whylogs profiles.
+    One of them is the reference profile, the "ground truth", and the other one is the target data,
     meaning that this is what the report will compare it against.
     In order to have it working, users should also define what reader and writer they wish to use,
     leveraging the existing whylogs' API for this.
@@ -44,24 +44,25 @@ class WhylogsSummaryDriftOperator(BaseOperator):
     Report
     :type write_report_path: str
 
-    :param reader: The desired whylogs profile reader to choose from. Learn about the existing readers on [our docs](https://whylogs.readthedocs.io/en/latest/index.html). 
-    Defaults to "local"
+    :param reader: The desired whylogs profile reader to choose from. Learn about the existing readers on 
+    [our docs](https://whylogs.readthedocs.io/en/latest/index.html). Defaults to "local"
     :type reader: Optional, str
 
-    :param writer: The desired whylogs profile writer to choose from. Learn about the existing writers on [our docs](https://whylogs.readthedocs.io/en/latest/index.html). 
-    Defaults to "local".
+    :param writer: The desired whylogs profile writer to choose from. Learn about the existing writers on 
+    [our docs](https://whylogs.readthedocs.io/en/latest/index.html). Defaults to "local".
     :type writer:  Optional, str
 
     """
+
     def __init__(
-            self,
-            *,
-            target_profile_path: str,
-            reference_profile_path: str,
-            write_report_path: str,
-            reader: Optional[str] = "local",
-            writer: Optional[str] = "local",
-            **kwargs
+        self,
+        *,
+        target_profile_path: str,
+        reference_profile_path: str,
+        write_report_path: str,
+        reader: Optional[str] = "local",
+        writer: Optional[str] = "local",
+        **kwargs,
     ):
         super().__init__(**kwargs)
         self.target_profile_path = target_profile_path
@@ -81,64 +82,68 @@ class WhylogsSummaryDriftOperator(BaseOperator):
 
 class WhylogsConstraintsOperator(BaseOperator):
     """
-    Creates a whylogs' Constraints report from a `Constraints` object or by using our pre-defined contraint factories,
-    as the example below shows. 
-    Currently our API requires the user to have a profiled DataFrame in place to be able to use it, so you will have to point
-    to a location where a profiled dataset exists. Then the operator will run a constraint suite that will check which conditions have
-    passed or failed. Users will also be able to leverage this to stop executions in case some criteria is not met.
-    
-    :param profile_path: The dataset profile path location, in case you want to use a single built-in constraint. Defaults to None.
+    Creates a whylogs' Constraints report from a `Constraints` object or by using our pre-defined 
+    contraint factories, as the example below shows.
+    Currently our API requires the user to have a profiled DataFrame in place to be able to use it, 
+    so you will have to point to a location where a profiled dataset exists. Then the operator will 
+    run a constraint suite that will check which conditions have passed or failed. Users will also 
+    be able to leverage this to stop executions in case some criteria is not met.
+
+    :param profile_path: The dataset profile path location, in case you want to use a single 
+    built-in constraint. Defaults to None.
     :type profile_path: Optional, str
 
-    :param reader: The desired whylogs profile reader to choose from. Learn about the existing readers on [our docs](https://whylogs.readthedocs.io/en/latest/index.html). 
-    Defaults to None.
+    :param reader: The desired whylogs profile reader to choose from. Learn about the existing readers
+    on [our docs](https://whylogs.readthedocs.io/en/latest/index.html). Defaults to None.
     :type reader: Optional, str
 
-    constraint
-    constraints  
-    break_pipeline
-
-    :param constraint: A MetricConstraints object, that can be used by leveraging the existing constraint factories on whylogs, 
-    as the example below shows. Defaults to None.
+    :param constraint: A MetricConstraints object, that can be used by leveraging the existing constraint 
+    factories on whylogs, as the example below shows. Defaults to None.
     :type constraint: `:class:MetricConstraint`, Optional
 
-    :param constraints: A Constraints object, that will have a user-defined constraints suite, as the second example below shows.
-    Defaults to None.
+    :param constraints: A Constraints object, that will have a user-defined constraints suite, as the 
+    second example below shows. Defaults to None.
     :type constraints: `:class:Constraint`, Optional
 
-    :param break_pipeline: Decide if you wish to raise an Airflow Exception and stop the existing DAG execution. Defaults to False
-    :type break_pipeline: bool 
+    :param break_pipeline: Decide if you wish to raise an Airflow Exception and stop the existing 
+    DAG execution. Defaults to False
+    :type break_pipeline: bool
 
 
     .. code-block:: python
-        
+
         from whylogs.core.constraints.factories import greater_than_number
 
         TASK_ID = "column_1_check"
         PROFILE_PATH = "s3://some/prefix/to/a/profile.bin"
 
-        with DAG(dag_id='constraints_example', start_date=datetime.now()) as dag: 
+        with DAG(dag_id='constraints_example', start_date=datetime.now()) as dag:
 
             op = WhylogsConstraintsOperator(
                 task_id=TASK_ID,
                 profile_path=PROFILE_PATH,
                 reader="s3",
-                constraint=greater_than_number(number=0.0, column="column_1")
+                constraint=greater_than_number(number=0.0, column="column_1"),
             )
 
-            op 
+            op
 
-    This allows for a higher granularity in terms of quickly identifying which tasks have failed, and also can
-    make the DAG more lenient towards breaking with some core checks and raising a warning with others. If instead you wish to
-    run all checks in a single task, the best thing is to inject a `:class:Constraints` object. The following example demonstrates how 
-    to do it:
+    This allows for a higher granularity in terms of quickly identifying which tasks have failed, 
+    and also can make the DAG more lenient towards breaking with some core checks and raising a 
+    warning with others. If instead you wish to run all checks in a single task, the best thing is 
+    to inject a `:class:Constraints` object. The following example demonstrates how to do it:
 
     .. code-block:: python
-        
-        from whylogs.core.constraints.factories import smaller_than_number, mean_between_range, null_percentage_below_number
+
+        from whylogs.core.constraints.factories import (
+            smaller_than_number,
+            mean_between_range,
+            null_percentage_below_number,
+        )
 
         TASK_ID = "column_1_check"
         PROFILE_PATH = "s3://some/prefix/to/a/profile.bin"
+
 
         def build_constraints():
             profile_view = why.reader("s3").read(path=PROFILE_PATH)
@@ -151,28 +156,28 @@ class WhylogsConstraintsOperator(BaseOperator):
             constraints = builder.build()
             return constraints
 
-        with DAG(dag_id='constraints_example', start_date=datetime.now()) as dag: 
+
+        with DAG(dag_id='constraints_example', start_date=datetime.now()) as dag:
 
             op = WhylogsConstraintsOperator(
-                task_id=TASK_ID,
-                profile_path=PROFILE_PATH,
-                reader="s3",
-                constraints=build_constraints()
+                task_id=TASK_ID, profile_path=PROFILE_PATH, reader="s3", constraints=build_constraints()
             )
 
-            op 
+            op
 
-    If you want to learn more about running constraint checks with whylogs, please check out our [docs and examples](https://whylogs.readthedocs.io/)
+    If you want to learn more about running constraint checks with whylogs, please check out our 
+    [docs and examples](https://whylogs.readthedocs.io/)
     """
+
     def __init__(
-            self,
-            *,
-            profile_path: Optional[str] = None,
-            reader: Optional[str] = None,
-            constraint: Optional[MetricConstraint] = None,
-            constraints: Optional[Constraints] = None,
-            break_pipeline: Optional[bool] = False,
-            **kwargs
+        self,
+        *,
+        profile_path: Optional[str] = None,
+        reader: Optional[str] = None,
+        constraint: Optional[MetricConstraint] = None,
+        constraints: Optional[Constraints] = None,
+        break_pipeline: Optional[bool] = False,
+        **kwargs,
     ):
         super().__init__(**kwargs)
         self.profile_path = profile_path

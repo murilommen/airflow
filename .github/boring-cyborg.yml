@@ -54,6 +54,11 @@ labelPRBasedOnFilePath:
     - docs/apache-airflow-providers-snowflake/**/*
     - tests/providers/snowflake/**/*
 
+  provider:WhyLogs:
+    - airflow/providers/whylogs/**/*
+    - docs/apache-airflow-providers-whylogs/**/*
+    - tests/providers/whylogs/**/*
+
   area:providers:
     - airflow/providers/**/*
     - docs/apache-airflow-providers-*/**/*

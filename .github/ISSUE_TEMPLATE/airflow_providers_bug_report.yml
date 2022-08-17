@@ -97,6 +97,7 @@ body:
         - telegram
         - trino
         - vertica
+        - whylogs
         - yandex
         - zendesk
     validations:

@@ -718,6 +718,14 @@
       "common.sql"
     ]
   },
+  "whylogs": {
+    "deps": [
+      "apache-airflow>=2.2.0",
+      "whylogs>=1.0.10",
+      "whylogs[viz]"
+    ],
+    "cross-providers-deps": []
+  },
   "yandex": {
     "deps": [
       "apache-airflow>=2.2.0",

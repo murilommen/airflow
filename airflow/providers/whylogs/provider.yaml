@@ -17,25 +17,23 @@
 
 ---
 package-name: apache-airflow-providers-whylogs
-name: whylogs
+name: Whylogs
 description: |
-    `whylogs <https://github.com/whylabs/whylogs>`__
+    `Whylogs <https://github.com/whylabs/whylogs>`__
 versions:
   - 1.0.0
 
-additional-dependencies:
+dependencies:
   - apache-airflow>=2.2.0
   - whylogs>=1.0.10
-  - whylogs[viz]
+  - "whylogs[viz]"
 
 integrations:
-  - integration-name: whylogs
-    external-doc-url: https://whylabs.ai/whylogs
-    how-to-guide:
-      - /docs/apache-airflow-providers-whylogs/operators/whylogs.rst
+  - integration-name: Whylogs
+    external-doc-url: https://whylabs.ai/whylogs/
     tags: [software]
 
 operators:
-  - integration-name: whylogs
+  - integration-name: Whylogs
     python-modules:
       - airflow.providers.whylogs.operators.whylogs
